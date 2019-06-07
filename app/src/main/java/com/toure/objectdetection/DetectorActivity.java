@@ -54,8 +54,8 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
   // Configuration values for the prepackaged SSD model.
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final boolean TF_OD_API_IS_QUANTIZED = true;
-  private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
-  private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/labelmap.txt";
+  private static final String TF_OD_API_MODEL_FILE = "detectx.tflite";
+  private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/labelmap1.txt";
   private static final DetectorMode MODE = DetectorMode.TF_OD_API;
   // Minimum detection confidence to track a detection.
   private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
@@ -224,8 +224,8 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
                   result.setLocation(location);
                   mappedRecognitions.add(result);
                   Log.d("Test", result.getTitle());
-                  speakDetectedObject(result.getTitle());
-                  Thread.sleep(2000);
+                  //speakDetectedObject(result.getTitle());
+                  //Thread.sleep(2000);
 
                 }
               }
@@ -236,13 +236,10 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
               computingDetection = false;
 
               runOnUiThread(
-                      new Runnable() {
-                        @Override
-                        public void run() {
-                          showFrameInfo(previewWidth + "x" + previewHeight);
-                          showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
-                          showInference(lastProcessingTimeMs + "ms");
-                        }
+                      () -> {
+                        showFrameInfo(previewWidth + "x" + previewHeight);
+                        showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
+                        showInference(lastProcessingTimeMs + "ms");
                       });
             }catch (Exception ex){
               ex.printStackTrace();
@@ -275,7 +272,7 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
   // Which detection model to use: by default uses Tensorflow Object Detection API frozen
   // checkpoints.
   private enum DetectorMode {
-    TF_OD_API;
+    TF_OD_API
   }
 
 }
