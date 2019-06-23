@@ -224,6 +224,8 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
                   result.setLocation(location);
                   mappedRecognitions.add(result);
                   Log.d("Test", result.getTitle());
+                  //Log.d("Dist", "Distance: " + result.getLocation().height());
+                  //getDistance(result.getLocation());
                   //speakDetectedObject(result.getTitle());
                   //Thread.sleep(2000);
 
@@ -273,6 +275,18 @@ public class DetectorActivity extends MainActivity implements OnImageAvailableLi
   // checkpoints.
   private enum DetectorMode {
     TF_OD_API
+  }
+
+  void getDistance(RectF location){
+    double focalLength;
+    double imageHieght = Math.round((location.top - location.bottom) * 0.0264583333 *10)/10.0; // image height in centimeters
+    if (isUseCamera2API()){
+      focalLength = ((CameraConnectionFragment)getFragmentManager().findFragmentById(R.id.container)).getFocalLength();
+    }
+    else{
+      focalLength = ((LegacyCameraConnectionFragment)getFragmentManager().findFragmentById(R.id.container)).getFocalLength();
+    }Log.d("Dis", "distance: "+ Math.round(focalLength*1500/imageHieght)/10.0);
+    Toast.makeText(this, "distance: "+ Math.round(focalLength*1500/imageHieght)/10.0, Toast.LENGTH_SHORT).show();
   }
 
 }

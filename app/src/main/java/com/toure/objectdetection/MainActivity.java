@@ -25,15 +25,15 @@ import android.view.Surface;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.toure.objectdetection.env.ImageUtils;
 import com.toure.objectdetection.env.Logger;
 
 import java.nio.ByteBuffer;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 public abstract class MainActivity extends AppCompatActivity
         implements ImageReader.OnImageAvailableListener,
@@ -457,7 +457,7 @@ public abstract class MainActivity extends AppCompatActivity
                 return 0;
         }
     }
-
+boolean isUseCamera2API(){return  useCamera2API;}
     void speakDetectedObject(@NonNull String objectLabel){
         if (mTTS != null && isTTSInitialised){
             mTTS.speak(objectLabel,TextToSpeech.QUEUE_FLUSH,null, objectLabel);

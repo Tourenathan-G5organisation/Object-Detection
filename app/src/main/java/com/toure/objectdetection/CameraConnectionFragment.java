@@ -570,4 +570,16 @@ public class CameraConnectionFragment extends Fragment {
           .create();
     }
   }
+
+  /**
+   * Return the camera focal length
+   * @return focal length in centimeters
+   */
+  double getFocalLength(){
+    if (previewRequest != null){
+      return  previewRequest.get(CaptureRequest.LENS_FOCAL_LENGTH)/10.0; // we divided by 10 to get the length in centimeters;
+    }
+    return 0;
+
+  }
 }

@@ -50,7 +50,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     ORIENTATIONS.append(Surface.ROTATION_270, 180);
   }
 
-  private Camera camera;
+    private Camera camera;
   private Camera.PreviewCallback imageListener;
   private Size desiredSize;
   /** The layout identifier to inflate for this Fragment. */
@@ -66,41 +66,8 @@ public class LegacyCameraConnectionFragment extends Fragment {
         @Override
         public void onSurfaceTextureAvailable(
             final SurfaceTexture texture, final int width, final int height) {
+initialiseCamera(texture);
 
-          int index = getCameraId();
-          camera = Camera.open(index);
-
-          try {
-            Camera.Parameters parameters = camera.getParameters();
-            List<String> focusModes = parameters.getSupportedFocusModes();
-            if (focusModes != null
-                && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-              parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            }
-            List<Camera.Size> cameraSizes = parameters.getSupportedPreviewSizes();
-            Size[] sizes = new Size[cameraSizes.size()];
-            int i = 0;
-            for (Camera.Size size : cameraSizes) {
-              sizes[i++] = new Size(size.width, size.height);
-            }
-            Size previewSize =
-                CameraConnectionFragment.chooseOptimalSize(
-                    sizes, desiredSize.getWidth(), desiredSize.getHeight());
-            parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
-            camera.setDisplayOrientation(90);
-            camera.setParameters(parameters);
-            camera.setPreviewTexture(texture);
-          } catch (IOException exception) {
-            camera.release();
-          }
-
-          camera.setPreviewCallbackWithBuffer(imageListener);
-          Camera.Size s = camera.getParameters().getPreviewSize();
-          camera.addCallbackBuffer(new byte[ImageUtils.getYUVByteSize(s.height, s.width)]);
-
-          textureView.setAspectRatio(s.height, s.width);
-
-          camera.startPreview();
         }
 
         @Override
@@ -115,6 +82,9 @@ public class LegacyCameraConnectionFragment extends Fragment {
         @Override
         public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
       };
+    public LegacyCameraConnectionFragment() {
+        super();
+    }
   /** An additional thread for running tasks that shouldn't block the UI. */
   private HandlerThread backgroundThread;
 
@@ -151,7 +121,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     // the SurfaceTextureListener).
 
     if (textureView.isAvailable()) {
-      camera.startPreview();
+      initialiseCamera(textureView.getSurfaceTexture());//camera.startPreview();
     } else {
       textureView.setSurfaceTextureListener(surfaceTextureListener);
     }
@@ -189,6 +159,46 @@ public class LegacyCameraConnectionFragment extends Fragment {
       camera = null;
     }
   }
+  private void initialiseCamera(final SurfaceTexture texture){
+
+
+                int index = getCameraId();
+                camera = Camera.open(index);
+
+                try {
+                  Camera.Parameters parameters = camera.getParameters();
+                  List<String> focusModes = parameters.getSupportedFocusModes();
+                  if (focusModes != null
+                          && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                  }
+                  List<Camera.Size> cameraSizes = parameters.getSupportedPreviewSizes();
+                  Size[] sizes = new Size[cameraSizes.size()];
+                  int i = 0;
+                  for (Camera.Size size : cameraSizes) {
+                    sizes[i++] = new Size(size.width, size.height);
+                  }
+                  Size previewSize =
+                          CameraConnectionFragment.chooseOptimalSize(
+                                  sizes, desiredSize.getWidth(), desiredSize.getHeight());
+                  parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
+                  camera.setDisplayOrientation(90);
+                  camera.setParameters(parameters);
+                  camera.setPreviewTexture(texture);
+                } catch (IOException exception) {
+                  camera.release();
+                }
+
+                camera.setPreviewCallbackWithBuffer(imageListener);
+                Camera.Size s = camera.getParameters().getPreviewSize();
+                camera.addCallbackBuffer(new byte[ImageUtils.getYUVByteSize(s.height, s.width)]);
+
+                textureView.setAspectRatio(s.height, s.width);
+
+                camera.startPreview();
+              }
+
+
 
   private int getCameraId() {
     CameraInfo ci = new CameraInfo();
@@ -197,5 +207,17 @@ public class LegacyCameraConnectionFragment extends Fragment {
       if (ci.facing == CameraInfo.CAMERA_FACING_BACK) return i;
     }
     return -1; // No camera found
+  }
+
+  /**
+   * Return the camera focal length
+   * @return focal length in centimeters
+   */
+  double getFocalLength(){
+    if (camera != null){
+      return  camera.getParameters().getFocalLength()/10.0; // we divided by 10 to get the length in centimeters
+    }
+    return 0;
+
   }
 }
